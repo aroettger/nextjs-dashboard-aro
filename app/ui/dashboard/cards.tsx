@@ -21,7 +21,7 @@ export default async function CardWrapper() {
     totalPaidInvoices, 
     totalPendingInvoices 
   } = await fetchCardData();
-  
+
   return (
     <>
       <Card title="Collected" value={totalPaidInvoices} type="collected" />
@@ -40,11 +40,11 @@ export function Card({
   title,
   value,
   type,
-}: {
+}: Readonly<{
   title: string;
   value: number | string;
   type: 'invoices' | 'customers' | 'pending' | 'collected';
-}) {
+}>) {
   const Icon = iconMap[type];
 
   return (
