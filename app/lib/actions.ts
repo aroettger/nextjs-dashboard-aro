@@ -12,7 +12,7 @@ const FormSchema = z.object({
   status: z.enum(['pending', 'paid']),
   date: z.string(),
 });
- 
+
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
@@ -24,7 +24,7 @@ export async function createInvoice(formData: FormData) {
     status: formData.get('status'),
   };
   */
-  
+
   // Alternative, if many fields:
   //const rawFormData = Object.fromEntries(formData.entries())
 
@@ -37,14 +37,21 @@ export async function createInvoice(formData: FormData) {
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
-  
+
   const amountInCents = amount * 100; // store in cents
   const date = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
 
   // and store:
-  await sql`
+  try {
+    await sql`
     INSERT INTO invoices (customer_id, amount, status, date)
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})`;
+
+  } catch (e) {
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
 
   // Purge cache
   revalidatePath('/dashboard/invoices');
@@ -57,20 +64,32 @@ export async function updateInvoice(id: string, formData: FormData) {
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
- 
+
   const amountInCents = amount * 100;
- 
-  await sql`
+
+  try {
+    await sql`
     UPDATE invoices
     SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-    WHERE id = ${id}
-  `;
- 
+    WHERE id = ${id}`;
+  } catch (e) {
+    return {
+      message: 'Database Error: Failed to Update Invoice.',
+    };
+  }
+
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
 
 export async function deleteInvoice(id: string) {
-  await sql`DELETE FROM invoices WHERE id = ${id}`;
+  try {
+    await sql`DELETE FROM invoices WHERE id = ${id}`;
+  } catch (e) {
+    return {
+      message: 'Database Error: Failed to Delete Invoice.',
+    };
+  }
+
   revalidatePath('/dashboard/invoices');
 }
