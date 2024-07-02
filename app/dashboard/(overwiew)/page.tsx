@@ -4,7 +4,12 @@ import CardWrapper from '../../ui/dashboard/cards';
 import LatestInvoices from '../../ui/dashboard/latest-invoices';
 import RevenueChart from '../../ui/dashboard/revenue-chart';
 import { CardsSkeleton, LatestInvoicesSkeleton, RevenueChartSkeleton } from '../../ui/skeletons';
+import { Metadata } from 'next';
  
+export const metadata: Metadata = {
+  title: 'Dashboard', // Template value for metadata in app\layout.tsx (see there)
+};
+
 export default async function Page() {
   // Beware! :-) Request waterfall (not really desired here, but may be sensible sometimes,
   // e.g. conditional fetching, or if one of the queries is much slower than the others):

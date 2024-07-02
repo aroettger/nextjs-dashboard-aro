@@ -1,12 +1,17 @@
 import { lusitana } from '@/app/ui/fonts';
 import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import Search from '@/app/ui/search';
+import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { fetchInvoicesPages } from '../../lib/data';
 import Pagination from '../../ui/invoices/pagination';
 import Table from '../../ui/invoices/table';
 import { InvoicesTableSkeleton } from '../../ui/skeletons';
- 
+
+export const metadata: Metadata = {
+  title: 'Invoices', // Template value for metadata in app\layout.tsx (see there)
+};
+
 export default async function Page({
   searchParams,
 }: Readonly<{
