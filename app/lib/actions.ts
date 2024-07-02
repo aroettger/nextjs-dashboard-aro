@@ -1,6 +1,8 @@
 'use server'; // this is a Server Action (will create an API endpoint behind the scenes)
 
+import { signIn } from '@/auth';
 import { sql } from '@vercel/postgres';
+import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod'; // type validation library
@@ -127,4 +129,25 @@ export async function deleteInvoice(id: string) {
   }
 
   revalidatePath('/dashboard/invoices');
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      ///console.log('error.type', error.type)
+      switch (error.type) /*NOSONAR*/ {
+        // Note: Currently will throw a CallbackRouteError instead. (Before that, the CredentialsSignin seems to be thrown, as seen in the log)
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
 }
